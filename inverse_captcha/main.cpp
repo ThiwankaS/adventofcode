@@ -2,6 +2,8 @@
 #include <string>
 #include <cstring>
 
+
+
 int main(void) {
 
     size_t sum = 0, next = 0, num = 0, len;
