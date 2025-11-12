@@ -1,60 +1,66 @@
 #include <iostream>
 #include <vector>
 
-
-
 void set_index(
     std::vector<std::pair<int,int>>& data,
     int& number,
     int limit,
-    int right,
-    int left,
-    int up,
-    int down,
+    int x,
+    int y,
     char p_direction,
+    char n_direction,
     int p_size) {
 
-        if(number == limit){
+        if(number == limit) {
             return ;
         }
-        if(p_direction == 'R') {
-            for(int i = 0; i < p_size && number < limit; i++) {
-                number++;
-                data.push_back(std::make_pair(right - left + i, up - down));
-            }
-            right++;
-            set_index(data, number, limit, right, left, up, down, 'U', p_size);
+        if(p_direction == 'I' && n_direction == 'R') {
+            x++;
+            number++;
+            data.push_back(std::make_pair(x, y));
+            set_index(data, number, limit, x, y, 'R', 'U', 1);
         }
-        if(p_direction == 'U') {
-            for(int i = 0; i < p_size && number < limit; i++) {
+        if(p_direction == 'R' && n_direction == 'U') {
+            for(int i = 0; i < p_size && number < limit; i++){
+                y++;
                 number++;
-                data.push_back(std::make_pair(right - left, up - down + i));
+                data.push_back(std::make_pair(x, y));
             }
-            up++;
-            set_index(data, number, limit, right, left, up, down, 'L', p_size + 1);
+            p_size++;
+            set_index(data, number, limit, x, y, 'U', 'L', p_size);
         }
-        if(p_direction == 'L') {
-            for(int i = 0; i <= p_size && number < limit; i++) {
+        if(p_direction == 'U' && n_direction == 'L') {
+            for(int i = 0; i < p_size && number < limit; i++){
+                x--;
                 number++;
-                data.push_back(std::make_pair(right - left - i, up - down));
+                data.push_back(std::make_pair(x, y));
             }
-            left++;
-            set_index(data, number, limit, right, left, up, down, 'D', p_size);
+            set_index(data, number, limit, x, y, 'L', 'D', p_size);
         }
-        if(p_direction == 'D') {
-            for(int i = 0; i < p_size && number < limit; i++) {
+        if(p_direction == 'L' && n_direction == 'D') {
+            for(int i = 0; i < p_size && number < limit; i++){
+                y--;
                 number++;
-                data.push_back(std::make_pair(right - left, up - down - i));
+                data.push_back(std::make_pair(x, y));
             }
-            down++;
-            set_index(data, number, limit, right, left, up, down, 'R', p_size + 1);
+            p_size++;
+            set_index(data, number, limit, x, y, 'D', 'R', p_size);
+        }
+        if(p_direction == 'D' && n_direction == 'R') {
+            for(int i = 0; i < p_size && number < limit; i++){
+                x++;
+                number++;
+                data.push_back(std::make_pair(x, y));
+            }
+            set_index(data, number, limit, x, y, 'R', 'U', p_size);
         }
 }
 
 std::vector<std::pair<int,int>> calculate_index(int limit) {
     std::vector<std::pair<int,int>>data;
-    int right = 0, left = 0, up = 0, down = 0, number = 1;
-    set_index(data, number, limit, right, left, up, down, 'R', 1);
+    int x = 0, y = 0, number = 1;
+    data.push_back(std::make_pair(x, y));
+    set_index(data, number, limit, x, y,'I', 'R', 1);
     return (data);
 }
 
@@ -67,14 +73,10 @@ int main(void) {
 
     data = calculate_index(limit);
 
-    int i = 1;
-    for(auto it : data) {
-        std::cout << "data ["
-            << i << "] : ("
-            << it.first << ", "
-            << it.second << ") \n";
-        i++;
-    }
+    int steps_required = std::abs((data[limit - 1].first - data[0].first))
+        + std::abs((data[limit - 1].second - data[0].second));
+
+    std::cout << "No of steps required : " << steps_required << "\n";
 
     return(EXIT_SUCCESS);
 }
