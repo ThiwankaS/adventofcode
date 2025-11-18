@@ -1,5 +1,15 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <utility>
+
+struct pair_hash {
+    size_t operator()(const std::pair<int, int>& p) const noexcept {
+        size_t h1 = std::hash<int>{}(p.first);
+        size_t h2 = std::hash<int>{}(p.second);
+        return ((h1 ^ h2) << 1);
+    }
+};
 
 void set_index(
     std::vector<std::pair<int,int>>& data,
@@ -64,6 +74,45 @@ std::vector<std::pair<int,int>> calculate_index(int limit) {
     return (data);
 }
 
+void solution_part_one(std::vector<std::pair<int,int>>& data, const int& limit) {
+    int steps_required = std::abs((data[limit - 1].first - data[0].first))
+        + std::abs((data[limit - 1].second - data[0].second));
+
+    std::cout << "No of steps required : " << steps_required << "\n";
+}
+
+int calculate_value(
+    std::unordered_map<std::pair<int,int>,int, pair_hash>& spiral_memory,
+    int x,
+    int y) {
+        auto getValue = [&spiral_memory](int a, int b) -> int {
+            if(auto it = spiral_memory.find({a, b}); it != spiral_memory.end()) {
+                return (it->second);
+            } else {
+                return (0);
+            }
+        };
+        return (getValue(x + 1, y) + getValue(x - 1, y) + getValue(x, y + 1) + getValue(x, y - 1)
+        + getValue(x - 1, y - 1) + getValue(x - 1, y + 1) + getValue(x + 1, y - 1) + getValue(x + 1, y + 1));
+    }
+
+void solution_part_two(std::vector<std::pair<int,int>>& data, const int& limit) {
+
+    int value = 1;
+    std::unordered_map<std::pair<int,int>,int, pair_hash> spiral_memory;
+    spiral_memory.emplace(std::make_pair(0, 0), value);
+    for(size_t i = 1; i < data.size(); i++) {
+        int x = data[i].first;
+        int y = data[i].second;
+        value = calculate_value(spiral_memory, x, y);
+        spiral_memory.emplace(std::make_pair(x, y), value);
+        if(value > limit){
+            break;
+        }
+    }
+    std::cout << "first large value : " << value << "\n";
+}
+
 int main(void) {
     int limit;
     std::vector<std::pair<int,int>>data;
@@ -73,10 +122,8 @@ int main(void) {
 
     data = calculate_index(limit);
 
-    int steps_required = std::abs((data[limit - 1].first - data[0].first))
-        + std::abs((data[limit - 1].second - data[0].second));
-
-    std::cout << "No of steps required : " << steps_required << "\n";
+    solution_part_one(data, limit);
+    solution_part_two(data, limit);
 
     return(EXIT_SUCCESS);
 }
