@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <utility>
 
+/*custome has fucntion*/
 struct pair_hash {
     size_t operator()(const std::pair<int, int>& p) const noexcept {
         size_t h1 = std::hash<int>{}(p.first);
@@ -85,6 +86,7 @@ int calculate_value(
     std::unordered_map<std::pair<int,int>,int, pair_hash>& spiral_memory,
     int x,
     int y) {
+        // lamda funtion
         auto getValue = [&spiral_memory](int a, int b) -> int {
             if(auto it = spiral_memory.find({a, b}); it != spiral_memory.end()) {
                 return (it->second);
